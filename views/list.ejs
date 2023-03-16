@@ -1,46 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+      integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+      crossorigin="anonymous"
+    />
 
     <title>NodeTest</title>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">Node Project</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item ">
-              <a class="nav-link" href="/">Home </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/write">Write</a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link " href="/list" role="button" >
-                DB List <span class="sr-only">(current)</span>
-              </a>
-            </li>
-        </div>
-      </nav>
+  </head>
+  <body>
+    <%- include('nav.html') %>
     <div class="p-5">
-    <h1 class="font-weight-bold">서버에서 가져온 리스트</h1>
-    <% for (var i = 0; i < datas.length; i++){ %>
-    <div class=" my-5"> 
-    <h4> 이름: <%= datas[i].name %></h4>
-    <p>등록 날짜: <%= datas[i].date %> </p>
-    <p> 내용: <%= datas[i].content %> </p>
+      <h1 class="font-weight-bold mb-2">서버에서 가져온 리스트</h1>
+      <ul class="list-group">
+        <% for (var i = 0; i < datas.length; i++){ %>
+        <li class="list-group-item">
+          <div class="py-2">
+            <p>글번호 : <%= datas[i]._id %></p>
+            <h4>이름: <%= datas[i].name %></h4>
+            <p>등록 날짜: <%= datas[i].date %></p>
+            <p>내용: <%= datas[i].content %></p>
+            <% if(datas[i].file) { %>
+            <a href="<%=datas[i].file %>"><%= datas[i].file %></a> <% } %>
+            <a href="./edit/<%= datas[i]._id %>"
+              ><button class="update mx-1">수정</button></a
+            >
+            <button class="delete" id="<%= datas[i]._id %>">삭제</button>
+          </div>
+        </li>
+        <% } %>
+      </ul>
     </div>
-    <% } %>
-</div>
-</body>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- jquery 사용 -->
+    <script>
+      $(".delete").click(e => {
+        let currentClick = $(e.target); //지금 이벤트가 동작하는 곳
+        $.ajax({
+          method: "DELETE",
+          url: "/delete",
+          data: { _id: e.target.id },
+        })
+          .done(res => {
+            console.log(currentClick);
+            currentClick.offsetParent("li").fadeOut();
+          })
+          .fail(err => {
+            console.log(err);
+          });
+      });
+      $(".update").click(e => {
+        let currentClick = $(e.target); //지금 이벤트가 동작하는 곳
+        $.ajax({
+          method: "UPDATE",
+          url: "/edit",
+          data: { _id: e.target.id },
+        })
+          .done(res => {
+            console.log(currentClick);
+            currentClick.offsetParent("li").fadeOut();
+          })
+          .fail(err => {
+            console.log(err);
+          });
+      });
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
