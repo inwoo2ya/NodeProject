@@ -22,29 +22,49 @@
   </head>
   <body>
     <%- include('nav.html') %>
-    <div class="d-flex w-100">
-      <form action="/login" method="POST" class="w-50">
+    <div class="w-100 p-5">
+      <h1 class="pb-5">SignUp</h1>
+      <form action="/signup" method="POST" id="form">
         <!-- add경로로 POST를 요청함 -->
-        <div class="flex-column p-5 w-auto">
+        <div class="flex-column">
           <div class="form-group">
-            <label> 이름: </label>
-            <input type="text" class="form-control w-50" name="id" />
+            <label> * 이름(ID): </label>
+            <input
+              type="text"
+              class="form-control w-25"
+              name="user_id"
+              required
+            />
           </div>
-          <div class="form-group">
-            <label> 비밀번호: </label>
-            <input type="password" class="form-control w-50" name="pw" />
+          <div class="d-flex">
+            <div class="form-group mr-4">
+              <label> * 비밀번호: </label>
+              <input
+                type="password"
+                class="form-control w-100"
+                name="user_pw"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label> * 비밀번호 확인:</label>
+              <input
+                type="password"
+                class="form-control w-100"
+                name="confirm_pw"
+                required
+              />
+            </div>
           </div>
 
           <div>
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary">Confirm</button>
           </div>
         </div>
       </form>
-      <div class="w-50">안녕하세요!</div>
     </div>
 
     <!-- Optional JavaScript; choose one of the two! -->
-
     <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
     <script
       src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"

@@ -19,7 +19,27 @@
     <title>NodeTest</title>
   </head>
   <body>
-    <%- include('nav.html') %>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">Node Project</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item ">
+            <a class="nav-link" href="/">Home </a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/write">Write</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="/list" role="button" >
+              DB List
+            </a>
+          </li>
+      </div>
+    </nav>
 
     <form
       style="margin: 10px 0 0 0"
@@ -30,14 +50,16 @@
       <!-- add경로로 POST를 요청함 -->
       <div class="flex-column p-5">
         <div class="form-group">
-          <label> 이름: </label>
-          <input type="text" class="form-control w-auto" name="name" />
+          <label> 제목: </label>
+          <input type="text" class="form-control w-25" name="title" required/>
         </div>
         <div class="form-group">
+          <label> 내용: </label>
           <textarea
             class="form-control w-50"
             placeholder="내용을 입력해주세요."
             name="content"
+            required
           ></textarea>
           <input
             type="file"

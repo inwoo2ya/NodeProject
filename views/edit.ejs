@@ -37,22 +37,18 @@
             value="<%=datas._id %>
             "
           />
-          <label> 이름: </label>
+          <label>제목: </label>
           <input
             type="text"
             class="form-control w-auto"
-            name="name"
-            value="<%= datas.name %>"
+            name="title"
+            value="<%= datas.title %>"
           />
         </div>
         <div class="form-group">
-          <textarea
-            class="form-control w-50"
-            placeholder="내용을 입력해주세요."
-            name="content"
-          >
+          <textarea class="form-control w-50" name="content">
 <%= datas.content %>
-</textarea
+        </textarea
           >
           <input
             type="file"
