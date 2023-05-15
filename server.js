@@ -1,8 +1,9 @@
 const timeTable = () => {
   const todate = new Date();
-  const today = `${todate.getFullYear()}-${
-    "0" + (todate.getMonth() + 1)
-  }-${todate.getDate()}`;
+  const today = `${todate.getFullYear()}-${(
+    "0" +
+    (todate.getMonth() + 1)
+  ).slice(-2)}-${("0" + todate.getDate()).slice(-2)}`;
   return today;
 };
 require("dotenv").config();
@@ -17,11 +18,24 @@ const hashedPassword = async password => {
 const bodyParser = require("body-parser");
 // body-parser는 요청 데이터(body) 해석을 쉽게 도와줌
 app.use(bodyParser.urlencoded({ extended: true }));
-const methodOverride = require("method-override");
+
+const methodOverride = require("method-override"); //Put 요청을 위해서 사용
 app.use(methodOverride("_method"));
 const MongoClient = require("mongodb").MongoClient;
 app.set("view engine", "ejs");
+const multer = require("multer");
+const path = require("path");
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/file/post/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().valueOf() + path.extname(file.originalname));
+  },
+});
+let upload = multer({ storage: storage });
 let db;
+
 MongoClient.connect(process.env.DB_URL, (err, client) => {
   if (err) {
     console.log(err);
@@ -59,7 +73,7 @@ app.get("/edit/:id", (req, res) => {
   );
 });
 
-app.put("/edit", (req, res) => {
+app.put("/edit", upload.single("editFile"), (req, res) => {
   db.collection("data1").updateOne(
     //어떤게시물을 수정할 건지
     { _id: parseInt(req.body.id) },
@@ -154,30 +168,30 @@ passport.deserializeUser((id, done) => {
 app.get("/fail", (req, res) => {
   res.send("404 ERROR");
 });
+app.use("/", require("./routes/loginUser"));
 
-function loginCheck(req, res, next) {
-  if (req.user) {
-    next();
-  } else {
-    return res.redirect("/login");
-  }
-}
-app.get("/mypage", loginCheck, (req, res) => {
-  res.render("myPage.ejs", { user: req.user });
-});
-app.get("/write", loginCheck, (req, res) => {
-  res.render("write.ejs", { user: req.user });
-});
-
-app.get("/list", loginCheck, (req, res) => {
-  //DB에 저장된 data1라는 collection안의 모든 데이터를 꺼내주세요
-  db.collection("data1")
-    .find()
-    .toArray((err, result) => {
-      console.log(result);
-      res.render("list.ejs", { datas: result, user: req.user });
-    });
-});
+// function loginCheck(req, res, next) {
+//   if (req.user) {
+//     next();
+//   } else {
+//     return res.redirect("/login");
+//   }
+// }
+// app.get("/mypage", loginCheck, (req, res) => {
+//   res.render("myPage.ejs", { user: req.user });
+// });
+// app.get("/write", loginCheck, (req, res) => {
+//   res.render("write.ejs", { user: req.user });
+// });
+// app.get("/list", loginCheck, (req, res) => {
+//   //DB에 저장된 data1라는 collection안의 모든 데이터를 꺼내주세요
+//   db.collection("data1")
+//     .find()
+//     .toArray((err, result) => {
+//       console.log(result);
+//       res.render("list.ejs", { datas: result, user: req.user });
+//     });
+// });
 
 app.get("/signup", (req, res) => {
   res.render("signup.ejs");
@@ -185,7 +199,7 @@ app.get("/signup", (req, res) => {
 
 app.post("/signup", (req, res) => {
   if (req.body.user_pw != req.body.confirm_pw) {
-    res.send("<script> alert('비밀번호가 틀렸어요');</script>");
+    res.send("비밀번호가 틀렸어요 다시 돌아가서 만드세요.");
   } else {
     // db.collection("user").findOne({
     //   id: req.body.user_id,
@@ -213,11 +227,13 @@ app.post("/signup", (req, res) => {
             }
           }
         );
+      } else {
+        return res.status(400).json({ msg: "이미 같은 아이디가 존재합니다." });
       }
     });
   }
 });
-app.post("/add", (req, res) => {
+app.post("/add", upload.single("file"), (req, res) => {
   res.render("write.ejs");
   db.collection("counter").findOne({ name: "게시물 갯수" }, (err, res) => {
     console.log(res.totalPost);
@@ -227,7 +243,7 @@ app.post("/add", (req, res) => {
       title: req.body.title,
       date: timeTable(),
       content: req.body.content,
-      file: req.body.file,
+      file: req.file.filename,
       writerId: req.user._id,
     };
     db.collection("data1").insertOne(createPost, (err, result) => {

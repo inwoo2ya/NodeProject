@@ -51,7 +51,7 @@
             <p>등록 날짜: <%= datas[i].date %></p>
             <p>내용: <%= datas[i].content %></p>
             <% if(datas[i].file) { %>
-            <a href="<%=datas[i].file %>"><%= datas[i].file %></a> <% } %>
+              <a href="/list/<%= datas[i].file %>" download><%= datas[i].file %></a> <% } %>
             <% if(user._id === datas[i].writerId) { %>
             <a href="./edit/<%= datas[i]._id %>"
               ><button class="update mx-1">수정</button></a

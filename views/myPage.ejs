@@ -20,8 +20,22 @@
   </head>
   <body>
     <%- include('nav.html') %>
-
-    <p><%= user.id %> MyPage 입니다.</p>
+    <div class="p-3">
+      <p><%= user.id %> MyPage 입니다.</p>
+      <form action="/upload" method="POST" enctype="multipart/form-data">
+        <div>
+          <label for="profile" class="font-weight-bold">프로필 변경</label>
+        </div>
+        <input
+          class="small"
+          type="file"
+          name="profile"
+          id="profile"
+          accept="image/png,image/jpeg,image/webp"
+        />
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
