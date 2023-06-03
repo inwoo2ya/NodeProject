@@ -25,18 +25,11 @@
       style="margin: 10px 0 0 0"
       action="/edit?_method=PUT"
       method="POST"
-      enctype="multipart/form-datacd"
+      enctype="multipart/form-data"
     >
       <!-- add경로로 POST를 요청함 -->
       <div class="flex-column p-5">
         <div class="form-group">
-          <input
-            type="text"
-            name="id"
-            style="display: none"
-            value="<%=datas._id %>
-            "
-          />
           <label>제목: </label>
           <input
             type="text"
@@ -47,17 +40,35 @@
         </div>
         <div class="form-group">
           <textarea class="form-control w-50" name="content">
-<%= datas.content %>
-        </textarea
+<%= datas.content %></textarea
           >
+          <% if(datas.file){ %>
           <input
+            id="editFileUpload"
             type="file"
             class="form-control-file my-3"
+            style="display: none"
             name="editFile"
-            value="<%= datas.file %>"
           />
+          <button
+            id="editBtn"
+            class="my-3"
+            onclick="onClickEdit();"
+            style="cursor: pointer"
+          >
+            파일 선택
+          </button>
+          <label for="editBtn" style="cursor: pointer"><%= datas.file %></label>
+          <script>
+            function onClickEdit() {
+              let editFile = document.getElementById("editFileUpload");
+              editFile.click();
+            }
+          </script>
+          <% } else{ %>
+          <input type="file" class="form-control-file my-3" name="editFile" />
+          <% } %>
         </div>
-
         <div><button type="submit" class="btn btn-primary">Submit</button></div>
       </div>
     </form>

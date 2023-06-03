@@ -58,6 +58,7 @@ app.get("/home", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  console.log(req.user);
   res.render("index.ejs");
 });
 
@@ -83,7 +84,7 @@ app.put("/edit", upload.single("editFile"), (req, res) => {
         title: req.body.title,
         date: timeTable(),
         content: req.body.content,
-        file: req.body.file,
+        file: req.body.editFile,
       },
     },
     //콜백함수
@@ -118,15 +119,58 @@ app.get("/login", (req, res) => {
 });
 app.post(
   "/login",
-  passport.authenticate("local", { failureRedirect: "/fail" }),
+  passport.authenticate("local", { failureRedirect: "/login" }),
   (req, res) => {
     res.redirect("/");
   }
 );
+app.get("/signup", (req, res) => {
+  res.render("signup.ejs");
+});
 
+app.post("/signup", (req, res) => {
+  if (req.body.user_pw != req.body.confirm_pw) {
+    res.send("비밀번호가 틀렸어요 다시 돌아가서 만드세요.");
+  } else {
+    // db.collection("user").findOne({
+    //   id: req.body.user_id,
+    // }),
+    //   (err, result) => {
+    // if (result) {
+    //   return res
+    //     .status(400)
+    //     .json({ msg: "이미 같은 아이디가 존재합니다." });
+    // }
+    let id = req.body.user_id;
+
+    db.collection("user").findOne({ id: id }, (err, result) => {
+      console.log(result);
+      if (result) {
+        return res.status(400).json({ msg: "이미 같은 아이디가 존재합니다." });
+      } else {
+        console.log(result, req.body.user_id);
+        db.collection("user").insertOne(
+          {
+            _id: ObjectID,
+            id: req.body.user_id,
+            pw: req.body.user_pw,
+            // pw: hashedPassword(req.body.user_pw),
+          },
+          (err, response) => {
+            if (!err) {
+              res.redirect("/login");
+            } else {
+              console.log(err);
+            }
+          }
+        );
+      }
+    });
+  }
+});
 passport.use(
   // 인증 라이브러리
-  new LocalStrategy(
+  new LocalStrategy( //세션
     {
       usernameField: "id",
       passwordField: "pw",
@@ -193,46 +237,6 @@ app.use("/", require("./routes/loginUser"));
 //     });
 // });
 
-app.get("/signup", (req, res) => {
-  res.render("signup.ejs");
-});
-
-app.post("/signup", (req, res) => {
-  if (req.body.user_pw != req.body.confirm_pw) {
-    res.send("비밀번호가 틀렸어요 다시 돌아가서 만드세요.");
-  } else {
-    // db.collection("user").findOne({
-    //   id: req.body.user_id,
-    // }),
-    //   (err, result) => {
-    // if (result) {
-    //   return res
-    //     .status(400)
-    //     .json({ msg: "이미 같은 아이디가 존재합니다." });
-    // }
-    db.collection("user").findOne({ id: req.body.user_id }, (res, err) => {
-      if (!res) {
-        db.collection("user").insertOne(
-          {
-            _id: ObjectID,
-            id: req.body.user_id,
-            pw: req.body.user_pw,
-            // pw: hashedPassword(req.body.user_pw),
-          },
-          (err, result) => {
-            if (err) {
-              console.log(err);
-            } else {
-              res.redirect("/login");
-            }
-          }
-        );
-      } else {
-        return res.status(400).json({ msg: "이미 같은 아이디가 존재합니다." });
-      }
-    });
-  }
-});
 app.post("/add", upload.single("file"), (req, res) => {
   res.render("write.ejs");
   db.collection("counter").findOne({ name: "게시물 갯수" }, (err, res) => {
@@ -299,4 +303,29 @@ app.get("/search", (req, res) => {
       console.log(result);
       res.render("search.ejs", { datas: result, result: req.query.value });
     });
+});
+app.get("/chatroom", (req, res) => {
+  res.redirect("/chat");
+});
+app.post("/chatroom", (req, res) => {
+  const toUser = ObjectID(req.body.toUserId);
+  const member = [toUser, req.user._id];
+  db.collection("user").findOne({ _id: toUser }, (err, result2) => {
+    if (!err) {
+      let createChat = {
+        title: result2.id,
+        member: member,
+        date: new Date(),
+      };
+      db.collection("chat").findOne({ member }, (err, result) => {
+        if (result) {
+          return;
+        } else {
+          db.collection("chat").insertOne(createChat);
+        }
+      });
+    } else {
+      return;
+    }
+  });
 });

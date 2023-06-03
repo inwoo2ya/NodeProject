@@ -42,7 +42,23 @@ function loginCheck(req, res, next) {
   }
 }
 router.get("/mypage", (req, res) => {
-  res.render("myPage.ejs", { user: req.user, profileImage: req });
+  db.collection("user")
+    .find()
+    .toArray((err, result) => {
+      let usersWithoutMe = [
+        ...result.filter(user => {
+          if (JSON.stringify(user._id) != JSON.stringify(req.user._id)) {
+            return user;
+          }
+        }),
+      ];
+      console.log(req.user._id, usersWithoutMe);
+      res.render("myPage.ejs", {
+        user: req.user,
+        profileImage: req,
+        userDatas: usersWithoutMe,
+      });
+    });
 });
 router.get("/write", (req, res) => {
   res.render("write.ejs", { user: req.user });
@@ -76,4 +92,43 @@ router.get("/image/:imageName", (req, res) => {
   );
 });
 
+router.get("/chat", (req, res) => {
+  db.collection("chat")
+    .find()
+    .toArray((err, result) => {
+      let chatResult = result.filter(v => v.member.includes(req.user._id));
+      res.render("chat.ejs", { chatroom: chatResult });
+    });
+});
+
+router.post("/message", (req, res) => {
+  let sendData = {
+    parent: req.body.parent,
+    content: req.body.content,
+    userid: req.user._id,
+    date: new Date(),
+  };
+  db.collection("message")
+    .insertOne(sendData)
+    .then(() => {
+      console.log("DB저장 성공");
+      res.send("저장 성공");
+    })
+    .catch(() => {
+      console.log("전송 실패");
+    });
+});
+
+// router.get("/chat/:user", (req, res) => {
+//   const to = req.params.user;
+//   const from = req.user.id;
+//   db.collection('chat').findOne({member:[]})
+//   res.render("chat.ejs", { toUser: to, fromUser: from });
+// });
+router.get("/logout", (req, res, next) => {
+  req.logout(err => {
+    return next(err);
+  });
+  res.redirect("/");
+});
 module.exports = router;

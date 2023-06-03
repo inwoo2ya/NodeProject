@@ -20,41 +20,66 @@
   </head>
   <body>
     <%- include('nav.html') %>
-    <div class="p-3">
-      <p><%= user.id %> MyPage 입니다.</p>
-      <form action="/upload" method="POST" enctype="multipart/form-data">
-        <div>
-          <label for="profile" class="font-weight-bold">프로필 변경</label>
-        </div>
-        <input
-          class="small"
-          type="file"
-          name="profile"
-          id="profile"
-          accept="image/png,image/jpeg,image/webp"
-        />
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
+    <div class="d-flex">
+      <div class="p-3 w-50">
+        <a href="/logout" class="text-black-50 font-weight-bold">로그아웃</a>
+        <p><%= user.id %> 님의 MyPage 입니다.</p>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+          <div>
+            <label for="profile" class="font-weight-bold">프로필 변경</label>
+          </div>
+          <input
+            class="small"
+            type="file"
+            name="profile"
+            id="profile"
+            accept="image/png,image/jpeg,image/webp"
+          />
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      <div class="p-3 w-50 align-items-center">
+        <h4 class="text-center font-weight-bold">유저 리스트</h4>
+        <ul class="list-group chat-list w-75 mx-auto">
+          <% if(userDatas) { %> <% for(var i=0; i < userDatas.length; i++ ) { %>
+          <li class="list-group-item">
+            <h6 class="d-inline-block"><%= userDatas[i].id %></h6>
+            <a href="/chatroom"
+              ><button
+                class="btn-outline-secondary float-right chat"
+                data-id="<%= userDatas[i]._id %>"
+              >
+                채팅
+              </button>
+            </a>
+          </li>
+          <% } }%>
+        </ul>
+      </div>
     </div>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(".chat").click(e => {
+        let _id = e.target.dataset.id;
+        $.ajax({
+          method: "POST",
+          url: "/chatroom",
+          data: { toUserId: _id },
+        }).then(() => {
+          console.log("채팅방 생성");
+        });
+      });
+    </script>
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: jQuery and Bootstrap Bundle (includes Popper) -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
-      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-      crossorigin="anonymous"
-    ></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
       crossorigin="anonymous"
     ></script>
-
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
-    -->
   </body>
 </html>

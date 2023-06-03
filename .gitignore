@@ -4,6 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
+/public/file/post/*
+/public/file/profile/*
 
 # testing
 /coverage
